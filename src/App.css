@@ -1,0 +1,156 @@
+/* Layout básico */
+:root {
+  --bg: #ffffff;
+  --card: #f6f7fb;
+  --muted: #6b7280;
+  --accent: #e11d48;
+  --dark: #0b1220;
+  --log-bg: #071022;
+}
+
+* { box-sizing: border-box; }
+
+body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; background: var(--bg); color: #0f172a; }
+
+/* Container */
+.container {
+  max-width: 980px;
+  margin: 18px auto;
+  padding: 20px;
+}
+
+/* header */
+.header { text-align: center; margin-bottom: 12px; }
+.header-gif { width: 140px; display: block; margin: 0 auto 8px; }
+
+/* picker */
+.picker {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+.picker label { font-weight: 600; display: flex; gap: 8px; align-items: center; }
+.picker select {
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid #e6e8ef;
+  background: #fff;
+  min-width: 140px;
+}
+
+/* Track / versus area */
+.versus {
+  position: relative;
+  height: 180px;
+  margin: 8px 0 12px;
+  border-radius: 12px;
+  background: linear-gradient(180deg,#f8fafc 0%, #eef2ff 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 8px 16px;
+  border: 1px solid #e6e8ef;
+}
+
+/* Runner common */
+.runner {
+  position: absolute;
+  top: 14px;
+  left: 0%;
+  transform: translateX(0);
+  width: 160px;
+  text-align: center;
+  transition: left 800ms cubic-bezier(.22,.9,.2,1), transform 200ms;
+  z-index: 2;
+}
+.runner img { width: 110px; height: auto; display: block; margin: 0 auto; }
+.runner h3 { margin: 6px 0 2px; font-size: 16px; }
+.runner p { margin: 0; color: var(--muted); font-size: 14px; }
+
+/* bottom runner slightly lower */
+.runner-bottom { top: 90px; }
+
+/* finish line marker */
+.finish-line {
+  position: absolute;
+  right: 6%;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 26px;
+  opacity: 0.9;
+  z-index: 3;
+}
+
+/* highlight quick effect when someone scores (pop) */
+.runner.win {
+  animation: pop 650ms ease forwards;
+}
+@keyframes pop {
+  0% { transform: translateX(0) scale(1); filter: drop-shadow(0 0 0 rgba(0,0,0,0)); }
+  40% { transform: translateX(0) scale(1.16); filter: drop-shadow(0 8px 18px rgba(0,0,0,0.12)); }
+  100% { transform: translateX(0) scale(1); filter: drop-shadow(0 0 0 rgba(0,0,0,0)); }
+}
+
+/* champion pulsing effect after final winner is declared */
+.runner.champion {
+  animation: championPulse 1100ms ease infinite;
+}
+@keyframes championPulse {
+  0% { box-shadow: 0 0 0 rgba(255, 184, 70, 0.0); transform: translateY(0); }
+  50% { box-shadow: 0 8px 30px rgba(255, 184, 70, 0.22); transform: translateY(-4px); }
+  100% { box-shadow: 0 0 0 rgba(255, 184, 70, 0); transform: translateY(0); }
+}
+
+/* actions (buttons) */
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin: 12px 0;
+}
+button {
+  border: none;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(2,6,23,0.06);
+}
+button.primary {
+  background: var(--accent);
+  color: #fff;
+}
+button.primary:disabled { opacity: 0.6; cursor: not-allowed; }
+button.secondary {
+  background: #475569;
+  color: #fff;
+}
+
+/* logs */
+.logs {
+  margin-top: 10px;
+  background: var(--log-bg);
+  color: #d1e3ff;
+  padding: 12px;
+  border-radius: 12px;
+  max-height: 300px;
+  overflow: auto;
+  line-height: 1.35;
+}
+.logs h4 { margin: 0 0 8px 0; color: #e6eefc; }
+.log-line { margin-bottom: 6px; }
+
+/* winner message */
+.winner {
+  text-align: center;
+  margin-top: 12px;
+  font-size: 20px;
+  color: #b45309;
+  font-weight: 800;
+}
+
+/* small helpers */
+.muted { color: #94a3b8; font-style: italic; }
+
