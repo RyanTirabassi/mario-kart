@@ -1,4 +1,4 @@
-/* Layout básico */
+/* Layout básico e variáveis */
 :root {
   --bg: #ffffff;
   --card: #f6f7fb;
@@ -6,31 +6,62 @@
   --accent: #e11d48;
   --dark: #0b1220;
   --log-bg: #071022;
+
+  --track-dark: #2d3436;
+  --track-light: #636e72;
+  --finish-color: #ffe600;
 }
 
+/* Reset básico */
 * { box-sizing: border-box; }
 
-body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; background: var(--bg); color: #0f172a; }
+/* Fonte e fundo */
+body {
+  margin: 0;
+  font-family: "Press Start 2P", system-ui, sans-serif;
+  background: linear-gradient(180deg, #f9fafb 0%, #dbeafe 100%);
+  color: var(--dark);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
 
-/* Container */
+/* Layout central */
 .container {
   max-width: 980px;
   margin: 18px auto;
   padding: 20px;
 }
 
-/* header */
-.header { text-align: center; margin-bottom: 12px; }
-.header-gif { width: 140px; display: block; margin: 0 auto 8px; }
+/* Cabeçalho */
+.header {
+  text-align: center;
+  margin-bottom: 12px;
+}
+.header-gif {
+  width: 140px;
+  display: block;
+  margin: 0 auto 8px;
+}
 
-/* picker */
+/* Title / subseções */
+h1 { margin: 6px 0; font-size: 20px; color: #0b1220; }
+p { margin: 0 0 8px 0; color: #334155; }
+
+/* Seletor de personagens */
 .picker {
   display: flex;
   justify-content: center;
   gap: 14px;
   margin-bottom: 12px;
 }
-.picker label { font-weight: 600; display: flex; gap: 8px; align-items: center; }
+.picker label {
+  font-weight: 600;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  color: #0f172a;
+  font-size: 12px;
+}
 .picker select {
   padding: 8px 10px;
   border-radius: 10px;
@@ -39,22 +70,25 @@ body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, "He
   min-width: 140px;
 }
 
-/* Track / versus area */
+/* Pista com imagem de fundo */
 .versus {
   position: relative;
-  height: 180px;
+  height: 220px;
   margin: 8px 0 12px;
   border-radius: 12px;
-  background: linear-gradient(180deg,#f8fafc 0%, #eef2ff 100%);
+  background:
+    url("/public/images/track-bg.png") center/cover no-repeat,
+    linear-gradient(180deg,#f8fafc 0%, #eef2ff 100%);
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
   padding: 8px 16px;
   border: 1px solid #e6e8ef;
+  box-shadow: 0 8px 30px rgba(2,6,23,0.06);
 }
 
-/* Runner common */
+/* Corredores */
 .runner {
   position: absolute;
   top: 14px;
@@ -64,46 +98,58 @@ body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, "He
   text-align: center;
   transition: left 800ms cubic-bezier(.22,.9,.2,1), transform 200ms;
   z-index: 2;
+  border-radius: 12px;
+  padding: 8px;
+  box-shadow: 0 6px 18px rgba(2,6,23,0.06);
+  background: transparent; /* 👈 linha adicionada */
 }
-.runner img { width: 110px; height: auto; display: block; margin: 0 auto; }
-.runner h3 { margin: 6px 0 2px; font-size: 16px; }
-.runner p { margin: 0; color: var(--muted); font-size: 14px; }
+.runner img {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+  margin: 0 auto;
+}
+.runner h3 {
+  margin: 6px 0 2px;
+  font-size: 14px;
+  color: var(--dark);
+}
+.runner p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+.runner-bottom { top: 120px; }
 
-/* bottom runner slightly lower */
-.runner-bottom { top: 90px; }
-
-/* finish line marker */
+/* Linha de chegada */
 .finish-line {
   position: absolute;
   right: 6%;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 26px;
-  opacity: 0.9;
+  font-size: 28px;
+  opacity: 0.95;
   z-index: 3;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15));
 }
 
-/* highlight quick effect when someone scores (pop) */
-.runner.win {
-  animation: pop 650ms ease forwards;
-}
+/* Efeito de vitória rápida */
+.runner.win { animation: pop 650ms ease forwards; }
 @keyframes pop {
-  0% { transform: translateX(0) scale(1); filter: drop-shadow(0 0 0 rgba(0,0,0,0)); }
-  40% { transform: translateX(0) scale(1.16); filter: drop-shadow(0 8px 18px rgba(0,0,0,0.12)); }
-  100% { transform: translateX(0) scale(1); filter: drop-shadow(0 0 0 rgba(0,0,0,0)); }
+  0% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(0,0,0,0)); }
+  40% { transform: scale(1.14); filter: drop-shadow(0 8px 18px rgba(0,0,0,0.12)); }
+  100% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(0,0,0,0)); }
 }
 
-/* champion pulsing effect after final winner is declared */
-.runner.champion {
-  animation: championPulse 1100ms ease infinite;
-}
+/* Campeão pulsante */
+.runner.champion { animation: championPulse 1100ms ease infinite; }
 @keyframes championPulse {
-  0% { box-shadow: 0 0 0 rgba(255, 184, 70, 0.0); transform: translateY(0); }
+  0% { box-shadow: 0 0 0 rgba(255, 184, 70, 0); transform: translateY(0); }
   50% { box-shadow: 0 8px 30px rgba(255, 184, 70, 0.22); transform: translateY(-4px); }
   100% { box-shadow: 0 0 0 rgba(255, 184, 70, 0); transform: translateY(0); }
 }
 
-/* actions (buttons) */
+/* Ações/botões */
 .actions {
   display: flex;
   justify-content: center;
@@ -117,18 +163,29 @@ button {
   font-weight: 700;
   cursor: pointer;
   box-shadow: 0 6px 18px rgba(2,6,23,0.06);
+  transition: transform .15s ease, box-shadow .15s ease;
+  outline: none;
+}
+button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 22px rgba(2,6,23,0.12);
 }
 button.primary {
   background: var(--accent);
   color: #fff;
+  font-family: "Press Start 2P", cursive;
 }
-button.primary:disabled { opacity: 0.6; cursor: not-allowed; }
+button.primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
 button.secondary {
   background: #475569;
   color: #fff;
+  font-family: "Press Start 2P", cursive;
 }
 
-/* logs */
+/* Logs */
 .logs {
   margin-top: 10px;
   background: var(--log-bg);
@@ -139,18 +196,43 @@ button.secondary {
   overflow: auto;
   line-height: 1.35;
 }
-.logs h4 { margin: 0 0 8px 0; color: #e6eefc; }
-.log-line { margin-bottom: 6px; }
+.logs h4 {
+  margin: 0 0 8px 0;
+  color: #e6eefc;
+}
+.log-line {
+  margin-bottom: 6px;
+}
 
-/* winner message */
+/* Mensagem de vencedor */
 .winner {
   text-align: center;
   margin-top: 12px;
-  font-size: 20px;
+  font-size: 18px;
   color: #b45309;
   font-weight: 800;
 }
 
-/* small helpers */
-.muted { color: #94a3b8; font-style: italic; }
+/* Ajuda de texto */
+.muted {
+  color: #94a3b8;
+  font-style: italic;
+}
 
+/* Responsividade */
+@media (max-width: 720px) {
+  .runner {
+    width: 140px;
+  }
+  .runner img {
+    width: 90px;
+    height: 90px;
+  }
+  .picker {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .versus {
+    height: 240px;
+  }
+}

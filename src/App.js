@@ -1,7 +1,7 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import "./App.css";
 
-// GIFs (coloque esses arquivos em src/assets)
+// GIFs — certifique-se de ter esses arquivos em src/assets com exatamente estes nomes
 import mario from "./assets/mario.gif";
 import luigi from "./assets/luigi.gif";
 import peach from "./assets/peach.gif";
@@ -34,22 +34,35 @@ export default function App() {
   const [p1Name, setP1Name] = useState("Mario");
   const [p2Name, setP2Name] = useState("Luigi");
 
-  // UI / estado da corrida
+  // estado da UI
   const [logs, setLogs] = useState([]);
   const [score, setScore] = useState({ p1: 0, p2: 0 });
-  const [progress, setProgress] = useState({ p1: 0, p2: 0 }); // valores em % (0..85)
+  const [progress, setProgress] = useState({ p1: 0, p2: 0 }); // % da pista (0..85)
   const [running, setRunning] = useState(false);
   const [winner, setWinner] = useState("");
   const [lastRoundWinner, setLastRoundWinner] = useState(null); // 'p1' | 'p2' | null
 
-  // para limpar timeouts ao reset
+  // timeouts para limpar
   const timeoutsRef = useRef([]);
 
   const names = Object.keys(CHARACTERS);
-  const maxPoints = 5; // 5 rodadas -> máximo 5 pontos
+  const maxPoints = 5; // número de rodadas
+
+  useEffect(() => {
+    return () => {
+      timeoutsRef.current.forEach((t) => clearTimeout(t));
+      timeoutsRef.current = [];
+    };
+  }, []);
 
   function pushLog(line) {
     setLogs((prev) => [...prev, line]);
+  }
+
+  function flashWinner(side) {
+    setLastRoundWinner(side);
+    const t = setTimeout(() => setLastRoundWinner(null), 700);
+    timeoutsRef.current.push(t);
   }
 
   function startRace() {
@@ -62,15 +75,15 @@ export default function App() {
     setLastRoundWinner(null);
     setRunning(true);
 
-    // clones dos personagens (estado interno da simulação)
+    // clones dos personagens para simulação
     const c1 = { ...CHARACTERS[p1Name], PONTOS: 0 };
     const c2 = { ...CHARACTERS[p2Name], PONTOS: 0 };
 
-    // limpa timeouts antigos se houver
+    // limpa timeouts antigos
     timeoutsRef.current.forEach((t) => clearTimeout(t));
     timeoutsRef.current = [];
 
-    const roundDuration = 1100; // ms entre rodadas (ajuste se quiser mais lento/rápido)
+    const roundDuration = 1100; // ms entre rodadas
 
     pushLog(`🏁🚨 Corrida entre ${c1.NOME} e ${c2.NOME} começando...\n`);
 
@@ -156,7 +169,7 @@ export default function App() {
 
         // atualiza placar e progresso visual (left %)
         setScore({ p1: c1.PONTOS, p2: c2.PONTOS });
-        const left1 = Math.round((c1.PONTOS / maxPoints) * 85); // 85% é margem para não estourar
+        const left1 = Math.round((c1.PONTOS / maxPoints) * 85);
         const left2 = Math.round((c2.PONTOS / maxPoints) * 85);
         setProgress({ p1: left1, p2: left2 });
 
@@ -181,16 +194,8 @@ export default function App() {
     }
   }
 
-  // dá um flash/efeito de vitória breve no corredor (classe CSS)
-  function flashWinner(side) {
-    setLastRoundWinner(side); // 'p1' | 'p2' | null
-    // limpa depois de 700ms
-    const t = setTimeout(() => setLastRoundWinner(null), 700);
-    timeoutsRef.current.push(t);
-  }
-
   function resetRace() {
-    // limpar todos timeouts pendentes
+    // limpar timeouts
     timeoutsRef.current.forEach((t) => clearTimeout(t));
     timeoutsRef.current = [];
 
@@ -205,7 +210,6 @@ export default function App() {
   const P1 = CHARACTERS[p1Name];
   const P2 = CHARACTERS[p2Name];
 
-  // Determina se P1 é campeão (para adicionar classe 'champion' ao final)
   const champP1 = winner && winner.includes(P1.NOME);
   const champP2 = winner && winner.includes(P2.NOME);
 
