@@ -1,106 +1,32 @@
-<img width="2522" height="1318" alt="image" src="https://github.com/user-attachments/assets/a4106bbf-3143-43ee-8d2b-a7f12fc9df38" />
+Mario Kart.JS - Simulação de Corrida
+📜 Descrição
 
-<h1>Desafio de projeto do Felipão: Mario Kart.JS</h1>
+Mario Kart.JS é uma aplicação web que simula uma corrida entre dois pilotos do universo de Mario Kart, utilizando animações visuais e histórico de resultados. O projeto foi desenvolvido para criar uma experiência interativa simples e divertida, em que o usuário pode iniciar corridas, visualizar o progresso de cada piloto e observar os resultados após cada rodada.
 
-  <table>
-        <tr>
-            <td>
-                <img src="./docs/header.gif" alt="Mario Kart" width="200">
-            </td>
-            <td>
-                <b>Objetivo:</b>
-                <p>Mario Kart é uma série de jogos de corrida desenvolvida e publicada pela Nintendo. Nosso desafio será criar uma lógica de um jogo de vídeo game para simular corridas de Mario Kart, levando em consideração as regras e mecânicas abaixo.</p>
-            </td>
-        </tr>
-    </table>
+🚀 Funcionalidades
 
-<h2>Players</h2>
-      <table style="border-collapse: collapse; width: 800px; margin: 0 auto;">
-        <tr>
-            <td style="border: 1px solid black; text-align: center;">
-                <p>Mario</p>
-                <img src="./docs/mario.gif" alt="Mario Kart" width="60" height="60">
-            </td>
-            <td style="border: 1px solid black; text-align: center;">
-                <p>Velocidade: 4</p>
-                <p>Manobrabilidade: 3</p>
-                <p>Poder: 3</p>
-            </td>
-             <td style="border: 1px solid black; text-align: center;">
-                <p>Peach</p>
-                <img src="./docs/peach.gif" alt="Mario Kart" width="60" height="60">
-            </td>
-            <td style="border: 1px solid black; text-align: center;">
-                <p>Velocidade: 3</p>
-                <p>Manobrabilidade: 4</p>
-                <p>Poder: 2</p>
-            </td>
-              <td style="border: 1px solid black; text-align: center;">
-                <p>Yoshi</p>
-                <img src="./docs/yoshi.gif" alt="Mario Kart" width="60" height="60">
-            </td>
-            <td style="border: 1px solid black; text-align: center;">
-                <p>Velocidade: 2</p>
-                <p>Manobrabilidade: 4</p>
-                <p>Poder: 3</p>
-            </td>
-        </tr>
-        <tr>
-            <td style="border: 1px solid black; text-align: center;">
-                <p>Bowser</p>
-                <img src="./docs/bowser.gif" alt="Mario Kart" width="60" height="60">
-            </td>
-            <td style="border: 1px solid black; text-align: center;">
-                <p>Velocidade: 5</p>
-                <p>Manobrabilidade: 2</p>
-                <p>Poder: 5</p>
-            </td>
-            <td style="border: 1px solid black; text-align: center;">
-                <p>Luigi</p>
-                <img src="./docs/luigi.gif" alt="Mario Kart" width="60" height="60">
-            </td>
-            <td style="border: 1px solid black; text-align: center;">
-                <p>Velocidade: 3</p>
-                <p>Manobrabilidade: 4</p>
-                <p>Poder: 4</p>
-            </td>
-            <td style="border: 1px solid black; text-align: center;">
-                <p>Donkey Kong</p>
-                <img src="./docs/dk.gif" alt="Mario Kart" width="60" height="60">
-            </td>
-            <td style="border: 1px solid black; text-align: center;">
-                <p>Velocidade: 2</p>
-                <p>Manobrabilidade: 2</p>
-                <p>Poder: 5</p>
-            </td>
-        </tr>
-    </table>
+Escolha de Pilotos: Selecione entre diferentes personagens do Mario Kart, como Mario e Luigi.
 
-<p></p>
+Simulação de Corrida: Ao iniciar uma corrida, os pilotos competem por 5 rodadas, com animações e efeitos visuais que simulam os eventos da corrida.
 
-<h3>🕹️ Regras & mecânicas:</h3>
+Itens Aleatórios: Durante a corrida, surpresas como itens e efeitos inesperados são ativados, o que adiciona emoção à corrida.
 
-<b>Jogadores:</b>
+Histórico de Corridas: O histórico das corridas anteriores é exibido, permitindo que o usuário acompanhe os resultados de cada rodada.
 
-<input type="checkbox" id="jogadores-item" />
-<label for="jogadores-item">O Computador deve receber dois personagens para disputar a corrida em um objeto cada</label>
+🔧 Tecnologias Utilizadas
 
-<b>Pistas:</b>
+HTML: Para estruturar a página e os elementos visuais.
 
-<ul>
-  <li><input type="checkbox" id="pistas-1-item" /> <label for="pistas-1-item">Os personagens irão correr em uma pista aleatória de 5 rodadas</label></li>
-  <li><input type="checkbox" id="pistas-2-item" /> <label for="pistas-2-item">A cada rodada, será sorteado um bloco da pista que pode ser uma reta, curva ou confronto</label>
-    <ul>
-      <li><input type="checkbox" id="pistas-2-1-item" /> <label for="pistas-2-1-item">Caso o bloco da pista seja uma RETA, o jogador deve jogar um dado de 6 lados e somar o atributo VELOCIDADE, quem vencer ganha um ponto</label></li>
-      <li><input type="checkbox" id="pistas-2-2-item" /> <label for="pistas-2-2-item">Caso o bloco da pista seja uma CURVA, o jogador deve jogar um dado de 6 lados e somar o atributo MANOBRABILIDADE, quem vencer ganha um ponto</label></li>
-      <li><input type="checkbox" id="pistas-2-3-item" /> <label for="pistas-2-3-item">Caso o bloco da pista seja um CONFRONTO, o jogador deve jogar um dado de 6 lados e somar o atributo PODER, quem perder, perde um ponto</label></li>
-      <li><input type="checkbox" id="pistas-2-3-item" /> <label for="pistas-2-3-item">Nenhum jogador pode ter pontuação negativa (valores abaixo de 0)</label></li>
-    </ul>
-  </li>
-</ul>
+CSS: Para estilização e animações de transições.
 
-<b>Condição de vitória:</b>
+JavaScript: Para a lógica da simulação de corridas, interação com o usuário e atualização do histórico.
 
-<input type="checkbox" id="vitoria-item" />
-<label for="vitoria-item">Ao final, vence quem acumulou mais pontos</label>
-<label for="vitoria-item">Ao final, vence quem acumulou mais pontos</label>
+Bibliotecas: Utilização de bibliotecas para animações e manipulação de eventos, como jQuery ou outras, dependendo das implementações feitas.
+
+⚙️ Como Usar
+
+Escolha os Pilotos: No topo da tela, selecione os pilotos de sua escolha (ex: Mario e Luigi).
+
+Iniciar Corrida: Clique no botão "Iniciar corrida" para começar a simulação. A corrida será realizada com animações e efeitos visuais.
+
+Acompanhe os Resultados: Após a corrida, o histórico será atualizado com o resultado da rodada, e o progresso será mostrado na linha de chegada.
