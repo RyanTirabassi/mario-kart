@@ -1,4 +1,10 @@
-/* Layout básico e variáveis */
+/* ============ Fonte opcional Google ============ */
+/* Pode remover se já tiver local */
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+/* =========================
+   Variáveis + Reset
+   ========================= */
 :root {
   --bg: #ffffff;
   --card: #f6f7fb;
@@ -7,52 +13,64 @@
   --dark: #0b1220;
   --log-bg: #071022;
 
-  --track-dark: #2d3436;
-  --track-light: #636e72;
+  --track-dark: #1f2937;
+  --track-light: #4b5563;
   --finish-color: #ffe600;
 }
 
-/* Reset básico */
 * { box-sizing: border-box; }
 
-/* Fonte e fundo */
+html, body, #root { height: 100%; }
+
 body {
   margin: 0;
-  font-family: "Press Start 2P", system-ui, sans-serif;
-  background: linear-gradient(180deg, #f9fafb 0%, #dbeafe 100%);
+  font-family: "Press Start 2P", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+  /* 🎯 FUNDO DE PÁGINA COMPLETO */
+  /* A imagem está em: src/assets/images/mario-bg.jpg */
+  background:
+    linear-gradient(180deg, rgba(28,40,64,.35), rgba(28,40,64,.35)),
+    url("./assets/images/mario-bg.jpg") center / cover no-repeat fixed;
+
   color: var(--dark);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
 }
 
-/* Layout central */
+/* camada de decorações globais (nuvens/moedas/blocos pelo site inteiro) */
+.page-decor {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* =========================
+   Layout base
+   ========================= */
 .container {
+  position: relative;
+  z-index: 2; /* fica acima do fundo animado */
   max-width: 980px;
   margin: 18px auto;
   padding: 20px;
 }
 
-/* Cabeçalho */
-.header {
-  text-align: center;
-  margin-bottom: 12px;
-}
-.header-gif {
-  width: 140px;
-  display: block;
-  margin: 0 auto 8px;
-}
+/* Header */
+.header { text-align: center; margin-bottom: 12px; }
+.header-gif { width: 140px; display: block; margin: 0 auto 8px; }
+h1 { margin: 6px 0; font-size: 20px; color: #0b1220; text-shadow: 0 2px 0 rgba(255,255,255,.6); }
+p  { margin: 0 0 8px 0; color: #e8eefc; text-shadow: 0 2px 0 rgba(12,18,32,.36); }
 
-/* Title / subseções */
-h1 { margin: 6px 0; font-size: 20px; color: #0b1220; }
-p { margin: 0 0 8px 0; color: #334155; }
-
-/* Seletor de personagens */
+/* Picker */
 .picker {
   display: flex;
   justify-content: center;
   gap: 14px;
   margin-bottom: 12px;
+  flex-wrap: wrap;
 }
 .picker label {
   font-weight: 600;
@@ -61,6 +79,10 @@ p { margin: 0 0 8px 0; color: #334155; }
   align-items: center;
   color: #0f172a;
   font-size: 12px;
+  padding: 6px 10px;
+  background: rgba(255,255,255,.85);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(2,6,23,.08);
 }
 .picker select {
   padding: 8px 10px;
@@ -70,28 +92,168 @@ p { margin: 0 0 8px 0; color: #334155; }
   min-width: 140px;
 }
 
-/* Pista com imagem de fundo */
+/* =========================
+   Pista / Área versus
+   ========================= */
 .versus {
   position: relative;
   height: 220px;
   margin: 8px 0 12px;
-  border-radius: 12px;
+  border-radius: 14px;
+
+  /* pista translúcida para ver o fundo */
   background:
-    url("/public/images/track-bg.png") center/cover no-repeat,
-    linear-gradient(180deg,#f8fafc 0%, #eef2ff 100%);
+    radial-gradient(60% 80% at 50% 50%, rgba(255,255,255,.06), rgba(255,255,255,0) 70%),
+    linear-gradient(180deg, rgba(9,13,22,.78), rgba(9,13,22,.78));
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
   padding: 8px 16px;
-  border: 1px solid #e6e8ef;
-  box-shadow: 0 8px 30px rgba(2,6,23,0.06);
+  border: 1px solid rgba(255,255,255,.2);
+  box-shadow: 0 12px 34px rgba(2,6,23,0.25), inset 0 0 0 1px rgba(255,255,255,.06);
 }
 
-/* Corredores */
+/* faixa tracejada simulando marcação da pista */
+.versus::before {
+  content: "";
+  position: absolute;
+  left: 4%; right: 4%;
+  top: 50%;
+  height: 6px;
+  transform: translateY(-50%);
+  background:
+    repeating-linear-gradient(
+      to right,
+      rgba(255,255,255,0.95) 0 36px,
+      rgba(255,255,255,0.0) 36px 74px
+    );
+  opacity: .9;
+  z-index: 1;
+  pointer-events: none;
+  filter: drop-shadow(0 2px 2px rgba(0,0,0,.18));
+}
+
+/* =========================
+   Elementos de cenário (Mario) DENTRO DA PISTA
+   ========================= */
+.bg-elements {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none; /* não atrapalha cliques */
+}
+
+/* Moeda (CSS-only) */
+.coin {
+  position: absolute;
+  width: 30px; height: 30px; /* aumentado */
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #fff 0 15%, #ffd24a 16% 60%, #f5b100 61% 100%);
+  box-shadow: 0 3px 0 #c69200, 0 10px 22px rgba(0,0,0,.15);
+  animation: coinFloat 1.8s ease-in-out infinite alternate;
+}
+.coin::after {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,.45);
+}
+.coin-big { width: 40px; height: 40px; }
+@keyframes coinFloat {
+  from { transform: translateY(0) rotate(0deg); }
+  to   { transform: translateY(-12px) rotate(6deg); } /* leve ajuste */
+}
+
+/* Bloco ? (CSS-only) */
+.block {
+  position: absolute;
+  width: 44px; height: 44px; /* aumentado */
+  border-radius: 8px;
+  background: linear-gradient(135deg, #f6a62f, #c76a12);
+  box-shadow: inset 0 8px 0 rgba(255,255,255,.25), inset 0 -6px 0 rgba(0,0,0,.2), 0 8px 24px rgba(2,6,23,.22);
+  animation: blockBob 2.2s ease-in-out infinite;
+}
+.block::before {
+  /* pontinhos dos cantos */
+  content: "";
+  position: absolute; inset: 0;
+  background: radial-gradient(#5b2b06 4px, transparent 4px) top left / 14px 14px repeat;
+  opacity: .25;
+  border-radius: 8px;
+}
+.block::after {
+  content: "?";
+  position: absolute; inset: 0;
+  display: grid; place-items: center;
+  color: #fff;
+  font-weight: 900;
+  text-shadow: 0 1px 0 #7a340c, 0 2px 0 #7a340c;
+  font-family: "Press Start 2P", system-ui, sans-serif;
+  font-size: 18px; /* aumentado */
+}
+.block-slow { animation-duration: 3.2s; }
+@keyframes blockBob {
+  0%   { transform: translateY(0); }
+  50%  { transform: translateY(-10px); } /* leve ajuste */
+  100% { transform: translateY(0); }
+}
+
+/* VARIANTES: aparecer também no rodapé (use classe coin-bottom / block-bottom) */
+.coin-bottom {
+  top: auto !important;
+  bottom: 6vh;
+  transform: translateY(0) scale(1.12);
+  filter: drop-shadow(0 8px 12px rgba(0,0,0,.18));
+  opacity: .95;
+}
+.block-bottom {
+  top: auto !important;
+  bottom: 8vh;
+  transform: translateY(0) scale(1.08);
+  filter: drop-shadow(0 10px 18px rgba(0,0,0,.22));
+  opacity: .98;
+}
+
+/* Responsividade: reduzimos quando a tela for pequena */
+@media (max-width: 720px) {
+  .coin { width: 24px; height: 24px; }
+  .coin-big { width: 30px; height: 30px; }
+  .block { width: 36px; height: 36px; font-size: 14px; }
+  .coin-bottom { bottom: 10vh; }
+  .block-bottom { bottom: 12vh; }
+}
+
+
+/* Nuvens (CSS-only) — usadas na página inteira */
+.cloud {
+  position: absolute;
+  width: 160px; height: 50px;
+  background: #fff;
+  border-radius: 50px;
+  box-shadow:
+    30px 0 0 10px #fff,
+    60px -6px 0 6px #fff,
+    84px 6px 0 8px #fff;
+  opacity: .92;
+  filter: drop-shadow(0 8px 14px rgba(2,6,23,.09));
+  animation: cloudDrift 28s linear infinite;
+  left: -220px;
+}
+.cloud-2 { animation-duration: 36s; transform: scale(.95); }
+.cloud-3 { animation-duration: 44s; transform: scale(.9); }
+@keyframes cloudDrift {
+  from { transform: translateX(0); }
+  to   { transform: translateX(140vw); }
+}
+
+/* =========================
+   Corredores
+   ========================= */
 .runner {
   position: absolute;
-  top: 14px;
+  top: 18px;
   left: 0%;
   transform: translateX(0);
   width: 160px;
@@ -99,57 +261,68 @@ p { margin: 0 0 8px 0; color: #334155; }
   transition: left 800ms cubic-bezier(.22,.9,.2,1), transform 200ms;
   z-index: 2;
   border-radius: 12px;
-  padding: 8px;
-  box-shadow: 0 6px 18px rgba(2,6,23,0.06);
-  background: transparent; /* 👈 linha adicionada */
+  padding: 6px 8px;
+  background: rgba(255,255,255,.0); /* transparente pra ver a pista */
 }
 .runner img {
   width: 100px;
   height: 100px;
-  object-fit: contain;
+  display: block;
   margin: 0 auto;
+  object-fit: contain;
+  image-rendering: pixelated; /* vibe retrô */
 }
 .runner h3 {
   margin: 6px 0 2px;
   font-size: 14px;
-  color: var(--dark);
+  color: #ffffff;
+  text-shadow: 0 2px 0 rgba(12,18,32,.6);
 }
 .runner p {
   margin: 0;
-  color: var(--muted);
-  font-size: 13px;
+  color: #e5edff;
+  font-size: 12px;
+  text-shadow: 0 2px 0 rgba(12,18,32,.5);
 }
-.runner-bottom { top: 120px; }
 
-/* Linha de chegada */
+/* corredor inferior (2ª faixa) */
+.runner-bottom { top: 126px; }
+
+/* linha de chegada */
 .finish-line {
   position: absolute;
   right: 6%;
   top: 50%;
   transform: translateY(-50%);
   font-size: 28px;
-  opacity: 0.95;
+  opacity: .95;
   z-index: 3;
-  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15));
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,.25));
 }
 
-/* Efeito de vitória rápida */
-.runner.win { animation: pop 650ms ease forwards; }
+/* efeito rápido de vitória */
+.runner.win {
+  animation: pop 650ms ease forwards;
+}
 @keyframes pop {
-  0% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(0,0,0,0)); }
-  40% { transform: scale(1.14); filter: drop-shadow(0 8px 18px rgba(0,0,0,0.12)); }
-  100% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(0,0,0,0)); }
+  0%   { transform: translateX(0) scale(1); filter: drop-shadow(0 0 0 rgba(0,0,0,0)); }
+  40%  { transform: translateX(0) scale(1.14); filter: drop-shadow(0 8px 18px rgba(0,0,0,0.22)); }
+  100% { transform: translateX(0) scale(1); filter: drop-shadow(0 0 0 rgba(0,0,0,0)); }
 }
 
-/* Campeão pulsante */
-.runner.champion { animation: championPulse 1100ms ease infinite; }
+/* campeão pulsando no fim */
+.runner.champion {
+  animation: championPulse 1100ms ease infinite;
+}
 @keyframes championPulse {
-  0% { box-shadow: 0 0 0 rgba(255, 184, 70, 0); transform: translateY(0); }
-  50% { box-shadow: 0 8px 30px rgba(255, 184, 70, 0.22); transform: translateY(-4px); }
+  0%   { box-shadow: 0 0 0 rgba(255, 184, 70, 0); transform: translateY(0); }
+  50%  { box-shadow: 0 8px 30px rgba(255, 184, 70, 0.35); transform: translateY(-4px); }
   100% { box-shadow: 0 0 0 rgba(255, 184, 70, 0); transform: translateY(0); }
 }
 
-/* Ações/botões */
+/* =========================
+   Ações / Botões
+   ========================= */
 .actions {
   display: flex;
   justify-content: center;
@@ -162,77 +335,95 @@ button {
   border-radius: 10px;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 6px 18px rgba(2,6,23,0.06);
+  box-shadow: 0 6px 18px rgba(2,6,23,0.18);
   transition: transform .15s ease, box-shadow .15s ease;
   outline: none;
 }
 button:hover {
   transform: translateY(-3px);
-  box-shadow: 0 10px 22px rgba(2,6,23,0.12);
+  box-shadow: 0 10px 22px rgba(2,6,23,0.28);
 }
 button.primary {
   background: var(--accent);
   color: #fff;
   font-family: "Press Start 2P", cursive;
 }
-button.primary:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
+button.primary:disabled { opacity: 0.6; cursor: not-allowed; }
 button.secondary {
   background: #475569;
   color: #fff;
   font-family: "Press Start 2P", cursive;
 }
 
-/* Logs */
+/* =========================
+   Logs
+   ========================= */
 .logs {
   margin-top: 10px;
-  background: var(--log-bg);
+  background: rgba(7,16,34,.92);
   color: #d1e3ff;
   padding: 12px;
   border-radius: 12px;
   max-height: 300px;
   overflow: auto;
   line-height: 1.35;
+  box-shadow: 0 10px 24px rgba(2,6,23,.22);
 }
-.logs h4 {
-  margin: 0 0 8px 0;
-  color: #e6eefc;
-}
-.log-line {
-  margin-bottom: 6px;
-}
+.logs h4 { margin: 0 0 8px 0; color: #e6eefc; }
+.log-line { margin-bottom: 6px; }
 
-/* Mensagem de vencedor */
+/* =========================
+   Mensagem de vencedor
+   ========================= */
 .winner {
   text-align: center;
   margin-top: 12px;
   font-size: 18px;
-  color: #b45309;
+  color: #ffd54a;
   font-weight: 800;
+  text-shadow: 0 2px 0 rgba(12,18,32,.5);
 }
 
-/* Ajuda de texto */
-.muted {
-  color: #94a3b8;
-  font-style: italic;
+/* =========================
+   Confete
+   ========================= */
+.confetti-root {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 999;
+  overflow: hidden;
+}
+.confetti-piece {
+  position: absolute;
+  top: -10px;
+  width: 10px; height: 16px;
+  border-radius: 2px;
+  animation-name: confettiFall, confettiSpin;
+  animation-timing-function: linear, linear;
+  animation-iteration-count: 1, infinite;
+}
+@keyframes confettiFall {
+  0%   { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(110vh) rotate(360deg); opacity: .9; }
+}
+@keyframes confettiSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
 }
 
-/* Responsividade */
+/* =========================
+   Helpers
+   ========================= */
+.muted { color: #c7d2fe; font-style: italic; }
+
+/* =========================
+   Responsividade
+   ========================= */
 @media (max-width: 720px) {
-  .runner {
-    width: 140px;
-  }
-  .runner img {
-    width: 90px;
-    height: 90px;
-  }
-  .picker {
-    flex-direction: column;
-    gap: 8px;
-  }
-  .versus {
-    height: 240px;
-  }
+  .runner { width: 140px; }
+  .runner img { width: 90px; height: 90px; }
+  .picker { flex-direction: column; gap: 8px; }
+  .versus { height: 260px; }
+  .runner-bottom { top: 150px; }
 }

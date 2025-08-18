@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import "./App.css";
+import bg from './assets/images/mario-bg.jpg';
 
-// GIFs — certifique-se de ter esses arquivos em src/assets com exatamente estes nomes
+// GIFs (coloque esses arquivos em src/assets com exatamente esses nomes)
 import mario from "./assets/mario.gif";
 import luigi from "./assets/luigi.gif";
 import peach from "./assets/peach.gif";
@@ -11,6 +12,7 @@ import dk from "./assets/dk.gif";
 import toad from "./assets/toad.gif";
 import header from "./assets/header.gif";
 
+// Base de personagens
 const CHARACTERS = {
   Mario:         { NOME: "Mario",        VELOCIDADE: 4, MANOBRABILIDADE: 3, PODER: 3, IMG: mario },
   Luigi:         { NOME: "Luigi",        VELOCIDADE: 3, MANOBRABILIDADE: 4, PODER: 4, IMG: luigi },
@@ -21,6 +23,7 @@ const CHARACTERS = {
   Toad:          { NOME: "Toad",         VELOCIDADE: 3, MANOBRABILIDADE: 5, PODER: 1, IMG: toad },
 };
 
+// Utilidades
 const rollDice = () => Math.floor(Math.random() * 6) + 1;
 const getRandomBlock = () => {
   const r = Math.random();
@@ -30,23 +33,31 @@ const getRandomBlock = () => {
 };
 
 export default function App() {
-  // pilotos selecionáveis
+  // aplica background importado via JS (garante que o bundler resolva o caminho)
+  useEffect(() => {
+    document.body.style.background = `linear-gradient(180deg, rgba(28,40,64,.35), rgba(28,40,64,.35)), url(${bg}) center / cover no-repeat fixed`;
+    return () => { document.body.style.background = ''; };
+  }, []);
+
+  // seleção de pilotos
   const [p1Name, setP1Name] = useState("Mario");
   const [p2Name, setP2Name] = useState("Luigi");
 
-  // estado da UI
+  // estado da corrida
   const [logs, setLogs] = useState([]);
   const [score, setScore] = useState({ p1: 0, p2: 0 });
-  const [progress, setProgress] = useState({ p1: 0, p2: 0 }); // % da pista (0..85)
+  const [progress, setProgress] = useState({ p1: 0, p2: 0 }); // 0..85 (% da pista)
   const [running, setRunning] = useState(false);
   const [winner, setWinner] = useState("");
   const [lastRoundWinner, setLastRoundWinner] = useState(null); // 'p1' | 'p2' | null
 
-  // timeouts para limpar
-  const timeoutsRef = useRef([]);
+  // confete
+  const [confetti, setConfetti] = useState([]);
 
+  // timeouts para limpar no reset/unmount
+  const timeoutsRef = useRef([]);
   const names = Object.keys(CHARACTERS);
-  const maxPoints = 5; // número de rodadas
+  const maxPoints = 5;
 
   useEffect(() => {
     return () => {
@@ -65,9 +76,23 @@ export default function App() {
     timeoutsRef.current.push(t);
   }
 
+  function fireConfetti() {
+    const COLORS = ["#e11d48", "#22c55e", "#3b82f6", "#f59e0b", "#ffffff"];
+    const pieces = Array.from({ length: 60 }).map((_, i) => ({
+      id: Date.now() + i,
+      left: Math.random() * 100,
+      delay: Math.random() * 250,
+      duration: 4 + Math.random() * 2,
+      color: COLORS[Math.floor(Math.random() * COLORS.length)],
+      spin: 1.2 + Math.random() * 1.4,
+    }));
+    setConfetti(pieces);
+    setTimeout(() => setConfetti([]), 6500);
+  }
+
   function startRace() {
     if (running) return;
-    // reset inicial
+
     setLogs([]);
     setWinner("");
     setScore({ p1: 0, p2: 0 });
@@ -75,15 +100,13 @@ export default function App() {
     setLastRoundWinner(null);
     setRunning(true);
 
-    // clones dos personagens para simulação
     const c1 = { ...CHARACTERS[p1Name], PONTOS: 0 };
     const c2 = { ...CHARACTERS[p2Name], PONTOS: 0 };
 
-    // limpa timeouts antigos
     timeoutsRef.current.forEach((t) => clearTimeout(t));
     timeoutsRef.current = [];
 
-    const roundDuration = 1100; // ms entre rodadas
+    const roundDuration = 1100;
 
     pushLog(`🏁🚨 Corrida entre ${c1.NOME} e ${c2.NOME} começando...\n`);
 
@@ -106,76 +129,42 @@ export default function App() {
           total2 = d2 + c2.VELOCIDADE;
           pushLog(`${c1.NOME} 🎲 ${d1} + Velocidade(${c1.VELOCIDADE}) = ${total1}`);
           pushLog(`${c2.NOME} 🎲 ${d2} + Velocidade(${c2.VELOCIDADE}) = ${total2}`);
-
-          if (total1 > total2) {
-            c1.PONTOS++;
-            pushLog(`${c1.NOME} marcou 1 ponto!`);
-            flashWinner("p1");
-          } else if (total2 > total1) {
-            c2.PONTOS++;
-            pushLog(`${c2.NOME} marcou 1 ponto!`);
-            flashWinner("p2");
-          } else {
-            pushLog("Empate na rodada, ninguém pontuou.");
-            flashWinner(null);
-          }
         } else if (block === "CURVA") {
           total1 = d1 + c1.MANOBRABILIDADE;
           total2 = d2 + c2.MANOBRABILIDADE;
           pushLog(`${c1.NOME} 🎲 ${d1} + Manobrabilidade(${c1.MANOBRABILIDADE}) = ${total1}`);
           pushLog(`${c2.NOME} 🎲 ${d2} + Manobrabilidade(${c2.MANOBRABILIDADE}) = ${total2}`);
-
-          if (total1 > total2) {
-            c1.PONTOS++;
-            pushLog(`${c1.NOME} marcou 1 ponto!`);
-            flashWinner("p1");
-          } else if (total2 > total1) {
-            c2.PONTOS++;
-            pushLog(`${c2.NOME} marcou 1 ponto!`);
-            flashWinner("p2");
-          } else {
-            pushLog("Empate na rodada, ninguém pontuou.");
-            flashWinner(null);
-          }
         } else {
-          // CONFRONTO
           const power1 = d1 + c1.PODER;
           const power2 = d2 + c2.PODER;
           pushLog(`${c1.NOME} confrontou ${c2.NOME}! 🥊`);
           pushLog(`${c1.NOME} 🎲 ${d1} + Poder(${c1.PODER}) = ${power1}`);
           pushLog(`${c2.NOME} 🎲 ${d2} + Poder(${c2.PODER}) = ${power2}`);
-
-          if (power1 > power2) {
-            if (c2.PONTOS > 0) {
-              c2.PONTOS = Math.max(0, c2.PONTOS - 1);
-              pushLog(`${c1.NOME} venceu o confronto! ${c2.NOME} perdeu 1 ponto 🐢`);
-            } else {
-              pushLog(`${c1.NOME} venceu o confronto, mas ${c2.NOME} não tinha pontos.`);
-            }
-            flashWinner("p1");
-          } else if (power2 > power1) {
-            if (c1.PONTOS > 0) {
-              c1.PONTOS = Math.max(0, c1.PONTOS - 1);
-              pushLog(`${c2.NOME} venceu o confronto! ${c1.NOME} perdeu 1 ponto 🐢`);
-            } else {
-              pushLog(`${c2.NOME} venceu o confronto, mas ${c1.NOME} não tinha pontos.`);
-            }
-            flashWinner("p2");
-          } else {
-            pushLog("Confronto empatado! Ninguém perdeu ponto.");
-            flashWinner(null);
-          }
+          total1 = power1;
+          total2 = power2;
         }
 
-        // atualiza placar e progresso visual (left %)
+        if (total1 > total2) {
+          c1.PONTOS++;
+          pushLog(`${c1.NOME} marcou 1 ponto!`);
+          flashWinner("p1");
+        } else if (total2 > total1) {
+          c2.PONTOS++;
+          pushLog(`${c2.NOME} marcou 1 ponto!`);
+          flashWinner("p2");
+        } else {
+          pushLog("Empate na rodada, ninguém pontuou.");
+          flashWinner(null);
+        }
+
         setScore({ p1: c1.PONTOS, p2: c2.PONTOS });
-        const left1 = Math.round((c1.PONTOS / maxPoints) * 85);
-        const left2 = Math.round((c2.PONTOS / maxPoints) * 85);
-        setProgress({ p1: left1, p2: left2 });
+        setProgress({
+          p1: Math.round((c1.PONTOS / maxPoints) * 85),
+          p2: Math.round((c2.PONTOS / maxPoints) * 85),
+        });
 
         pushLog("-----------------------------");
 
-        // Se última rodada, calcula vencedor depois de pequena pausa
         if (round === 5) {
           const t2 = setTimeout(() => {
             let msg = "A corrida terminou em empate!";
@@ -184,6 +173,10 @@ export default function App() {
 
             setWinner(msg);
             pushLog(msg);
+
+            if (!msg.includes("empate")) {
+              fireConfetti();
+            }
             setRunning(false);
           }, 600);
           timeoutsRef.current.push(t2);
@@ -195,7 +188,6 @@ export default function App() {
   }
 
   function resetRace() {
-    // limpar timeouts
     timeoutsRef.current.forEach((t) => clearTimeout(t));
     timeoutsRef.current = [];
 
@@ -205,6 +197,7 @@ export default function App() {
     setProgress({ p1: 0, p2: 0 });
     setWinner("");
     setLastRoundWinner(null);
+    setConfetti([]);
   }
 
   const P1 = CHARACTERS[p1Name];
@@ -215,6 +208,30 @@ export default function App() {
 
   return (
     <main className="container">
+      <div className="page-decor" aria-hidden>
+        <span className="cloud cloud-1" style={{ top: "6vh" }} />
+        <span className="cloud cloud-2" style={{ top: "12vh" }} />
+        <span className="cloud cloud-3" style={{ top: "18vh" }} />
+
+        <span className="coin coin-big" style={{ top: "24vh", left: "12%" }} />
+        <span className="coin" style={{ top: "30vh", left: "26%" }} />
+        <span className="coin" style={{ top: "22vh", left: "44%" }} />
+        <span className="coin coin-big" style={{ top: "28vh", left: "66%" }} />
+        <span className="coin" style={{ top: "34vh", left: "82%" }} />
+
+        <span className="block" style={{ top: "42vh", left: "18%" }} />
+        <span className="block block-slow" style={{ top: "46vh", left: "52%" }} />
+        <span className="block" style={{ top: "40vh", left: "74%" }} />
+
+        {/* decorações na parte inferior */}
+        <span className="coin coin-big coin-bottom" style={{ left: "8%" }} />
+        <span className="coin coin-bottom" style={{ left: "22%" }} />
+        <span className="block block-bottom" style={{ left: "34%" }} />
+        <span className="coin coin-bottom" style={{ left: "50%" }} />
+        <span className="block block-slow block-bottom" style={{ left: "66%" }} />
+        <span className="coin coin-big coin-bottom" style={{ left: "80%" }} />
+      </div>
+
       <header className="header">
         <img src={header} alt="Mario Kart Header" className="header-gif" />
         <h1>Mario Kart.JS</h1>
@@ -226,9 +243,7 @@ export default function App() {
           Piloto 1:
           <select value={p1Name} onChange={(e) => setP1Name(e.target.value)} disabled={running}>
             {names.map((n) => (
-              <option key={n} value={n} disabled={n === p2Name}>
-                {n}
-              </option>
+              <option key={n} value={n} disabled={n === p2Name}>{n}</option>
             ))}
           </select>
         </label>
@@ -237,15 +252,25 @@ export default function App() {
           Piloto 2:
           <select value={p2Name} onChange={(e) => setP2Name(e.target.value)} disabled={running}>
             {names.map((n) => (
-              <option key={n} value={n} disabled={n === p1Name}>
-                {n}
-              </option>
+              <option key={n} value={n} disabled={n === p1Name}>{n}</option>
             ))}
           </select>
         </label>
       </div>
 
       <section className="versus">
+        <div className="bg-elements" aria-hidden>
+          <span className="coin" style={{ top: "24px", left: "14%" }} />
+          <span className="coin" style={{ top: "52px", left: "32%" }} />
+          <span className="coin" style={{ top: "36px", left: "46%" }} />
+          <span className="coin" style={{ top: "28px", left: "62%" }} />
+          <span className="coin" style={{ top: "48px", left: "78%" }} />
+
+          <span className="block" style={{ top: "86px", left: "26%" }} />
+          <span className="block" style={{ top: "78px", left: "58%" }} />
+          <span className="block" style={{ top: "94px", left: "72%" }} />
+        </div>
+
         <div
           className={`runner ${lastRoundWinner === "p1" ? "win" : ""} ${champP1 ? "champion" : ""}`}
           style={{ left: `${progress.p1}%` }}
@@ -271,22 +296,35 @@ export default function App() {
         <button onClick={startRace} disabled={running} className="primary">
           {running ? "Corrida em andamento..." : "Iniciar corrida"}
         </button>
-        <button onClick={resetRace} className="secondary">
-          Reset
-        </button>
+        <button onClick={resetRace} className="secondary">Reset</button>
       </div>
 
       <section className="logs">
         <h4>Histórico</h4>
         {logs.length === 0 && <p className="muted">Nenhuma rodada ainda. Clique em "Iniciar corrida".</p>}
         {logs.map((line, i) => (
-          <div key={i} className="log-line">
-            {line}
-          </div>
+          <div key={i} className="log-line">{line}</div>
         ))}
       </section>
 
       {winner && <h2 className="winner">{winner}</h2>}
+
+      {confetti.length > 0 && (
+        <div className="confetti-root" aria-hidden>
+          {confetti.map((c) => (
+            <span
+              key={c.id}
+              className="confetti-piece"
+              style={{
+                left: `${c.left}%`,
+                background: c.color,
+                animationDuration: `${c.duration}s, ${c.spin}s`,
+                animationDelay: `${c.delay}ms, 0s`,
+              }}
+            />
+          ))}
+        </div>
+      )}
     </main>
   );
 }
